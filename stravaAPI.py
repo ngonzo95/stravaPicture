@@ -47,6 +47,47 @@ class StravaAPI:
 
 		return runIDs
 
+	def _addRunIDsToList(self, activities, runIDs):
+		for act in activities:
+			#Filter out the list so that we only get the runs with gps signals
+			if (act['type'] == "Run" and 'start_latlng' in act and act['start_latlng'] != None):
+				runIDs.append(act['id'])
+
+
+
+	"""This function gets the last numRuns runIDS a user has done from the strava api.
+	This function returns a tuple which includes the time stap"""
+	def getLastNRunIDs(self, numRuns):
+		#This is the base url that will get all the activities from a certin page
+		baseURL = 'https://www.strava.com/api/v3/activities?page='
+		print baseURL
+
+		runIDs = []
+
+		#pages numbers start at 1
+		pageNum = 1
+		#Go through all of the pages until we have the desired number of runs
+		while len(runIDs) < numRuns:
+			#Create the url to query
+			print pageNum
+			url = baseURL + str(pageNum)
+			print url
+			activities = self._sendRequest(url)
+
+			#Add the run ids to the list 
+			self._addRunIDsToList(activities,runIDs)
+
+			#Increment the page number
+			pageNum += 1
+
+			#Limit the number of pages we can look at so we dont go on forever
+			#if they dont have enough runs
+			if pageNum > (numRuns/3):
+				break
+
+		#We may get more runs than we need so only return the amount they asked for
+		return runIDs[:numRuns]
+
 	""" This function takes in a run id and returns the runs gps information as
 	a list of gps position lists"""
 	def getGPSFromID(self, runID):
@@ -72,14 +113,19 @@ class StravaAPI:
 #Basic script to show that class functions work as expected
 def main():
 	client = StravaAPI('/Users/Nick/Documents/stravaProject/stravaPicture/token.txt')
-	runIDs = client.getRunIDs()
-	
-	gpsData = []
-	for ID in runIDs:
-		gpsData.append(client.getGPSFromID(ID))
+	runIDs = client.getLastNRunIDs(50)
 
-	with open ('gps.json','w') as outfile:
-		json.dump(gpsData, outfile)
+	print runIDs
+	print ""
+
+	print client.getRunIDs()
+	
+	# gpsData = []
+	# for ID in runIDs:
+	# 	gpsData.append(client.getGPSFromID(ID))
+
+	#with open ('gps.json','w') as outfile:
+	#	json.dump(gpsData, outfile)
 
 
 if __name__ == '__main__':

@@ -31,19 +31,15 @@ class StravaAPI:
 		#return the resulting json object as a dictonary
 		return json.loads(res.read())
 
-	""" This function quieries the strava api to find out all the activities they
-	have done and then selects only the runs which have gps values associated with
-	them. It then returns all of thoes ids in a list """
-	def getRunIDs(self):
+	""" This is a private function that helps us test different things with the api """
+	def _getRunIDs(self):
 		#Get the activities from the strava api
 		activities = self._sendRequest('https://www.strava.com/api/v3/activities')
 
-		
+		print activities[0]
+
 		runIDs = []
-		for act in activities:
-			#Filter out the list so that we only get the runs with gps signals
-			if (act['type'] == "Run" and 'start_latlng' in act and act['start_latlng'] != None):
-				runIDs.append(act['id'])
+		self._addRunIDsToList(activities,runIDs)
 
 		return runIDs
 
@@ -56,27 +52,27 @@ class StravaAPI:
 
 
 	"""This function gets the last numRuns runIDS a user has done from the strava api.
-	This function returns a tuple which includes the time stap"""
+	This function returns a tuple which includes the timestamp of the latest activity done"""
 	def getLastNRunIDs(self, numRuns):
 		#This is the base url that will get all the activities from a certin page
 		baseURL = 'https://www.strava.com/api/v3/activities?page='
-		print baseURL
 
 		runIDs = []
 
 		#pages numbers start at 1
 		pageNum = 1
+
+
 		#Go through all of the pages until we have the desired number of runs
 		while len(runIDs) < numRuns:
-			#Create the url to query
-			print pageNum
+			#Create the url to query and query it
 			url = baseURL + str(pageNum)
-			print url
 			activities = self._sendRequest(url)
 
 			#Add the run ids to the list 
 			self._addRunIDsToList(activities,runIDs)
 
+			#If this is the first page we want to 
 			#Increment the page number
 			pageNum += 1
 
@@ -113,19 +109,16 @@ class StravaAPI:
 #Basic script to show that class functions work as expected
 def main():
 	client = StravaAPI('/Users/Nick/Documents/stravaProject/stravaPicture/token.txt')
-	runIDs = client.getLastNRunIDs(50)
+	#runIDs = client.getLastNRunIDs(50)
 
-	print runIDs
-	print ""
-
-	print client.getRunIDs()
+	#runIDs = client.getRunIDs()
 	
 	# gpsData = []
 	# for ID in runIDs:
 	# 	gpsData.append(client.getGPSFromID(ID))
 
-	#with open ('gps.json','w') as outfile:
-	#	json.dump(gpsData, outfile)
+	# with open ('gps.json','w') as outfile:
+	# 	json.dump(gpsData, outfile)
 
 
 if __name__ == '__main__':

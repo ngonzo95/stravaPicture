@@ -32,7 +32,7 @@ class RunMap:
 	"""Renders the map and saves the html file"""
 	def genMap(self):
 		mapViz = folium.Map(location=self._startPoint,
-			zoom_start=13,
+			zoom_start=12,
 			tiles= self._mapType,
 			attr= self._attr)
 
@@ -78,11 +78,13 @@ def main():
 		gps = json.load(data_file)
 
 	#Create the base map centered on the most recent run
-	m = RunMap(gps[0][0],10)
+	m = RunMap(gps[0][0],45)
 
 	#add each of the runs with a different color
-	for i in range(len(gps)):
-		m.addRun(gps[i])
+	#This list is reversed so that the newest runs are added lasy
+	#and therefore on top
+	for run in reversed(gps):
+		m.addRun(run)
 
 	#same the html of the map so we can look at it
 	m.genMap()

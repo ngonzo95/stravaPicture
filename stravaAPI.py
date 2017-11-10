@@ -41,8 +41,6 @@ class StravaAPI:
 		runIDs = []
 		self._addRunIDsToList(activities,runIDs)
 
-		return runIDs
-
 	def _addRunIDsToList(self, activities, runIDs):
 		for act in activities:
 			#Filter out the list so that we only get the runs with gps signals

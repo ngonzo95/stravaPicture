@@ -78,7 +78,7 @@ def main():
 		gps = json.load(data_file)
 
 	#Create the base map centered on the most recent run
-	m = RunMap(gps[0][0],45)
+	m = RunMap(gps[0][0],100)
 
 	#add each of the runs with a different color
 	#This list is reversed so that the newest runs are added lasy

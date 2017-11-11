@@ -48,6 +48,7 @@ class StravaAPI:
 			if (act['type'] == "Run" and 'start_latlng' in act and act['start_latlng'] != None):
 				runIDs.append(act['id'])
 
+	#This is a helper function that gets the timestamp for an activity 
 	def _getTime(self, activity):
 		#Get the utc time from the activity formated in the way strava likes it
 		stravaTime = activity['start_date']
@@ -61,52 +62,10 @@ class StravaAPI:
 
 		return epochTime
 
-	#TODO Refactor code of next two methods to remove duplicate code
-	"""This function gets the last numRuns runIDS a user has done from the strava api.
-	This function returns a tuple which includes the timestamp of the latest activity done"""
-	def getLastNRunIDs(self, numRuns):
-		#This is the base url that will get all the activities from a certin page
-		baseURL = 'https://www.strava.com/api/v3/activities?page='
-
-		runIDs = []
-
-		timeStamp = ""
-		#pages numbers start at 1
-		pageNum = 1
-
-
-		#Go through all of the pages until we have the desired number of runs
-		while len(runIDs) < numRuns:
-			#Create the url to query and query it
-			url = baseURL + str(pageNum)
-			activities = self._sendRequest(url)
-
-			#Add the run ids to the list 
-			self._addRunIDsToList(activities,runIDs)
-
-			#If this is the first page we want to save the time of the first
-			#activity to return to the user
-			if pageNum == 1:
-				timeStamp = self._getTime(activities[0])
-
-
-			#Increment the page number
-			pageNum += 1
-
-			#Limit the number of pages we can look at so we dont go on forever
-			#if they dont have enough runs. also if the last page was empty end
-			if pageNum > (numRuns/3) or activities == []:
-				break
-
-
-		#We may get more runs than we need so only return the amount they asked for
-		return (timeStamp, runIDs[:numRuns])
-
-	"""Gets the all the runs since a given time. Optional argument to set a maximum on
-	the number of runs you want"""
-	def getLatestRuns(self, lastRunTime, maxRuns=100):
-		#Create base URL and initalize parameters
-		baseURL = 'https://www.strava.com/api/v3/activities?after=' +str(lastRunTime) + '&page='
+	#This is a helper function which takes a baseURL which we will query strava with
+	#and reads until we have read all possible pages or reach a certin number of runs
+	def _getRunIDsFromBaseURL(self, baseURL, maxRuns=100):
+		#Initilize all of the variables
 		pageNum = 1
 		runIDs = []
 		timeStamp = ''
@@ -115,14 +74,14 @@ class StravaAPI:
 		url = baseURL + str(pageNum)
 		activities = self._sendRequest(url) 
 		
-		#If there have been no new activities since last time return 
+		#If the page returns empty there are no runs to be taken
 		if activities == []:
 			return(lastRunTime,[])
 
 		#Get the time of the latest activity
 		timeStamp = self._getTime(activities[0])
 
-		#While activities are not empty
+		#continue until the page we query from strava is empty
 		while activities:
 			#Add the run ids to the list 
 			self._addRunIDsToList(activities,runIDs)
@@ -134,8 +93,7 @@ class StravaAPI:
 			url = baseURL + str(pageNum)
 			activities = self._sendRequest(url)
 
-			#If there are alot of runs exit once we hit the
-			#max
+			#If we hit the max before we read all the pages end
 			if len(runIDs) > maxRuns:
 				#Clean up the array so we only have the max
 				runIDs = runIDs[:maxRuns]
@@ -145,9 +103,25 @@ class StravaAPI:
 			#so we dont accidentally overload the api
 			if pageNum > (maxRuns/3):
 				break
-		
 
-		return(timeStamp, runIDs)
+		return(timeStamp,runIDs)
+
+
+	"""This function gets the last numRuns runIDS a user has done from the strava api.
+	This function returns a tuple which includes the timestamp of the latest activity done"""
+	def getLastNRunIDs(self, numRuns):
+		#This is the base url that will get all the activities from a certin page
+		baseURL = 'https://www.strava.com/api/v3/activities?page='
+
+		return self._getRunIDsFromBaseURL(baseURL, maxRuns= numRuns)
+
+	"""Gets the all the runs since a given time. Optional argument to set a maximum on
+	the number of runs you want"""
+	def getLatestRuns(self, lastRunTime):
+		#Create base URL and initalize parameters
+		baseURL = 'https://www.strava.com/api/v3/activities?after=' +str(lastRunTime) + '&page='
+		
+		return self._getRunIDsFromBaseURL(baseURL)
 
 
 
@@ -176,10 +150,10 @@ class StravaAPI:
 #Basic script to show that class functions work as expected
 def main():
 	client = StravaAPI('/Users/Nick/Documents/stravaProject/stravaPicture/token.txt')
-	#timeStamp, runIDs = client.getLastNRunIDs(50)
+	timeStamp, runIDs = client.getLastNRunIDs(100)
 
 	#runIDs = client._getRunIDs()
-	timeStamp, runIDs = client.getLatestRuns(1507575398)
+	#timeStamp, runIDs = client.getLatestRuns(1507575398)
 
 	print timeStamp
 	print len(runIDs)

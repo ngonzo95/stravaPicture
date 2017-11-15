@@ -84,8 +84,9 @@ def initInfo(client,m,numRuns):
 		lastRun, runIDs = client.getLastNRunIDs(numRuns)
 		runGPS = getGPS(client, runIDs)
 
-		#Save the info for the first time so we have it for later
-		saveInfo(runIDs, runGPS, lastRun)
+		if lastRun != 0:
+			#Save the info for the first time so we have it for later
+			saveInfo(runIDs, runGPS, lastRun)
 
 	#add the runs to the map with the first one being added on last
 	for run in reversed(runGPS):

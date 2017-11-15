@@ -24,10 +24,16 @@ class StravaAPI:
 		tokenString = 'access_token ' + self._token
 		req.add_header('Authorization', tokenString)
 
+		res = None
 		#Load the url and return the json object
-		res = urllib2.urlopen(req)
-
-		#TODO deal with failed requests
+		try:
+			res = urllib2.urlopen(req)
+		
+		#If we cannot load the url then return the empty string
+		#and print the error
+		except Exception, e:
+			print str(e)
+			return []
 
 		#return the resulting json object as a dictonary
 		return json.loads(res.read())
@@ -64,7 +70,7 @@ class StravaAPI:
 
 	#This is a helper function which takes a baseURL which we will query strava with
 	#and reads until we have read all possible pages or reach a certin number of runs
-	def _getRunIDsFromBaseURL(self, baseURL, maxRuns=100):
+	def _getRunIDsFromBaseURL(self, baseURL, lastRunTime, maxRuns=100):
 		#Initilize all of the variables
 		pageNum = 1
 		runIDs = []
@@ -113,7 +119,7 @@ class StravaAPI:
 		#This is the base url that will get all the activities from a certin page
 		baseURL = 'https://www.strava.com/api/v3/activities?page='
 
-		return self._getRunIDsFromBaseURL(baseURL, maxRuns= numRuns)
+		return self._getRunIDsFromBaseURL(baseURL, 0, maxRuns= numRuns)
 
 	"""Gets the all the runs since a given time. Optional argument to set a maximum on
 	the number of runs you want"""
@@ -121,7 +127,7 @@ class StravaAPI:
 		#Create base URL and initalize parameters
 		baseURL = 'https://www.strava.com/api/v3/activities?after=' +str(lastRunTime) + '&page='
 		
-		return self._getRunIDsFromBaseURL(baseURL)
+		return self._getRunIDsFromBaseURL(baseURL,lastRunTime)
 
 
 

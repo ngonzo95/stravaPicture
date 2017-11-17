@@ -29,7 +29,7 @@ def main():
 	while True:
 		#Update every 30 mins
 		time.sleep(1800)
-		lastRun, runIDs, runGPS = updateInfo(client,m,runIDs,runGPS,lastRun)
+		lastRun, runIDs, runGPS = updateInfo(client,m,runIDs,runGPS,lastRun,numRuns)
 		saveInfo(runIDs,runGPS,lastRun)
 		m.genMap()
 

@@ -62,13 +62,7 @@ class RunMap:
 
 		#Figure out if we need to add a new starting point for this run or if it will fit in 
 		#an existing map
-		for gpsPoint in self._startPoints:
-			if self._distBetween(gpsPoint, gps[0]) < 100:
-				return
-
-		#If we did not return by this point then this point does not fit in a map and we must 
-		#add one for it
-		self._startPoints.append(gps[0])
+		self._checkPointOnMap(gps[0])
 
 	"""Save all the file information by saving the runlist queue and the
 	   time of the last run."""
@@ -86,22 +80,15 @@ class RunMap:
 
 			#Go through the run list to load starting points
 			for run in savedQueue:
-				addPoint = True
-				for gpsPoint in self._startPoints:
-					if self._distBetween(gpsPoint, run[0]) < 100:
-						addPoint = False
-						break
-				#If we did not return by this point then this point does not fit in a map and we must 
-				#add one for it
-				if addPoint:
-					self._startPoints.append(run[0])
+				self._checkPointOnMap(run[0])
 
 			self._runList = collections.deque(savedQueue)
 
 			return lastRun
+        
         #If the load fails makes sure the queue is empty and we return 0
 		except Exception, e:
-			raise e
+			print e
 			self._runList = collections.deque()
 			return 0
 
@@ -134,6 +121,20 @@ class RunMap:
 		km = 6371* c
 		return km
 
+	"""Checks if this point is visable in a map and if it is not it adds it as a starting point
+	   of a new map"""
+
+	def _checkPointOnMap(self, point):
+		addPoint = True
+		for gpsPoint in self._startPoints:
+			if self._distBetween(gpsPoint, point) < 100:
+				addPoint = False
+				break
+
+		#If we did not return by this point then this point does not fit in a map and we must 
+		#add one for it
+		if addPoint:
+			self._startPoints.append(point)
 
 
 		

@@ -1,7 +1,5 @@
 token.txt
 *.json
-index.html
-index.temp.html
 *.pyc
-templates/maps
-my_new_file.html
+templates/maps/*
+views/*

@@ -1,6 +1,7 @@
 import folium
 from colour import Color
 import collections
+import json
 
 class RunMap:
 	"""docstring for RunMap"""
@@ -8,7 +9,7 @@ class RunMap:
 	#optional fields include map type and the number of runs the map display. you can also specify
 	#a specific colorGradient which is a list of different colors of size numRuns, the oldest run
 	#will use the color at index 0
-	def __init__(self, startPoint, numRuns,
+	def __init__(self, numRuns, startPoint=[44.9501,-93.2701] ,
 		mapType='https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
 		attr='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 		colorGrad = None):
@@ -63,6 +64,31 @@ class RunMap:
 
 		#add the run to the list
 		self._runList.append(gps)
+
+	"""Save all the file information by saving the runlist queue and the
+	   time of the last run."""
+	def saveRuns(self, lastRun):
+		with open ('runSave.json','w') as outfile:
+			json.dump((lastRun, list(self._runList)), outfile)
+
+	"""Load from file and return the time of the last run. If we get an error
+	   while loading the queue will revert to empty and return 0."""
+	def loadRuns(self):
+		#Try to load from the file 
+		try:
+			with open('runSave.json') as saveFile:    
+				lastRun, savedQueue = json.load(saveFile)
+
+			self._runList = collections.deque(savedQueue)
+			return lastRun
+        #If the load fails makes sure the queue is empty and we return 0
+		except Exception, e:
+			self._runList = collections.deque()
+			return 0
+
+
+			lastRun, runIDs = client.getLastNRunIDs(numRuns)
+			runGPS = getGPS(client, runIDs)
 
 
 		

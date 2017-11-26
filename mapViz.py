@@ -45,7 +45,7 @@ class RunMap:
 
 
 		#save the map to the maps file
-		mapViz.save('templates/map.html')
+		mapViz.save('templates/maps/map.html')
 
 
 	"""Adds a run to the map. This function takes in a list of gps points """

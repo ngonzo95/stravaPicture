@@ -85,6 +85,11 @@ class RunMap:
 			runGPS = getGPS(client, runIDs)
 
 
+	"""Gets the number of maps the map viz will create at this point"""
+	def numMaps(self):
+		return len(self._startPoints)
+
+
 		
 
 #A sample script to run to test the file

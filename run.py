@@ -76,20 +76,32 @@ def addRunIDsToMap(client,m,runIDs):
 		run = client.getGPSFromID(runID)
 		m.addRun(run)
 
-def genHTML():
+def genHTML(m):
 	templateLoader = jinja2.FileSystemLoader( searchpath="./templates")
 	templateEnv = jinja2.Environment(loader=templateLoader)
 	TEMPLATE_FILE = "template.html"
 	template = templateEnv.get_template( TEMPLATE_FILE )
-	outputText = template.render({'baseMap':'maps/map0.html','maps':[{'href':'index1.html', 'caption': 'min'}, {'href':'index2.html', 'caption': 'bos'}]}) # this is where to put args to the template renderer
+	
+	#First we can make the maps list since that will be the same in all cases
+	mapList = []
+	for i in range(m.numMaps):
+		mapDict = {}
+		mapDict['href'] = 'index' + str(i) + '.html'
+		mapDict['caption'] = 'Map ' + str(i)
+		mapList.append(mapDict)
 
-	with open("views/index1.html", "wb") as fh:
-		fh.write(outputText)		
+	#Now render each map with its own index file
+	renderDict = {'maps': mapList}
 
-	outputText = template.render({'baseMap':'maps/map1.html','maps':[{'href':'index1.html', 'caption': 'min'}, {'href':'index2.html', 'caption': 'bos'}]}) # this is where to put args to the template renderer
+	for i in range(m.numMaps):
+		renderDict['baseMap'] = 'maps/map' + str(i) + '.html'
 
-	with open("views/index2.html", "wb") as fh:
-		fh.write(outputText)
+		outputText = template.render(renderDict)
+		fileName = 'views/index' + str(i) + '.html'
+
+		with open(fileName, "wb") as fh:
+			fh.write(outputText)		
+
 
 
 if __name__ == '__main__':

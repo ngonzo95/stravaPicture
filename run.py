@@ -81,17 +81,9 @@ def genHTML(m):
 	templateEnv = jinja2.Environment(loader=templateLoader)
 	TEMPLATE_FILE = "template.html"
 	template = templateEnv.get_template( TEMPLATE_FILE )
-	
-	#First we can make the maps list since that will be the same in all cases
-	mapList = []
-	for i in range(m.numMaps()):
-		mapDict = {}
-		mapDict['href'] = 'index' + str(i) + '.html'
-		mapDict['caption'] = 'Map ' + str(i)
-		mapList.append(mapDict)
 
 	#Now render each map with its own index file
-	renderDict = {'maps': mapList}
+	renderDict = m.getMapDropdownDict()
 
 	for i in range(m.numMaps()):
 		renderDict['baseMap'] = 'maps/map' + str(i) + '.html'

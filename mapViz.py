@@ -3,6 +3,7 @@ from colour import Color
 import collections
 import json
 from math import radians, cos, sin, asin, sqrt
+from geopy.geocoders import Nominatim
 
 class RunMap:
 	"""docstring for RunMap"""
@@ -39,8 +40,6 @@ class RunMap:
 				zoom_start=12,
 				tiles= self._mapType,
 				attr= self._attr)
-
-			#mapViz.create_map(path='map.html', template='runHTMLTemplate.html')
 
 			for i in range(len(self._runList)):
 				runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i].hex, opacity=0.4)
@@ -101,6 +100,17 @@ class RunMap:
 	def numMaps(self):
 		return len(self._startPoints)
 
+	"""Returns a map that is uses for creating the drop down options"""
+	def getMapDropdownDict(self):
+		#First we can make the maps list since that will be the same in all cases
+		mapList = []
+		for i in range(self.numMaps()):
+			mapDict = {}
+			mapDict['href'] = 'index' + str(i) + '.html'
+			mapDict['caption'] = self._getCaption(i)
+			mapList.append(mapDict)
+
+		return {'maps': mapList}
 
 	"""Estimates distance between two gps points in km taken from stack
 	   exchange:"""
@@ -136,9 +146,28 @@ class RunMap:
 		if addPoint:
 			self._startPoints.append(point)
 
-
+	def _getCaption(self, mapNum):
+		#Get the location information from geolocator
+		geolocator = Nominatim()
+		pointList = self._startPoints[mapNum]
+		pointStr = str(pointList[0]) + ', ' + str(pointList[1])
+		location = geolocator.reverse(pointStr)
 		
+		#Try to get a city or town name, if not possible just return map
+		try:
+			if 'city' in location.raw['address']:
+				return location.raw['address']['city']
 
+			if 'town' in location.raw['address']:
+				return location.raw['address']['town']
+
+			print "Weird location recived"
+			print location.raw
+			return "Map"
+		except Exception, e:
+			print e
+			return "Map"
+		
 #A sample script to run to test the file
 def main():
 	#We only want to import json for testing

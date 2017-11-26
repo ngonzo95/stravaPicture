@@ -37,24 +37,16 @@ class RunMap:
 			tiles= self._mapType,
 			attr= self._attr)
 
+		#mapViz.create_map(path='map.html', template='runHTMLTemplate.html')
+
 		for i in range(len(self._runList)):
 			runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i].hex, opacity=0.4)
 			runViz.add_to(mapViz)
 
 
-		#save it to a temporary html
-		mapViz.save('index.temp.html')
+		#save the map to the maps file
+		mapViz.save('templates/map.html')
 
-		#add the auto refresh line to the html file
-		with open('index.temp.html', 'r') as infile:
-			with open('index.html', 'w') as outfile:
-				counter = 0
-				for line in infile:
-					if counter == 2:
-						#This makes it some the html will automaticall refresh every 30 mins
-						outfile.write('<META HTTP-EQUIV="refresh" CONTENT="1800"/> \n')
-					outfile.write(line)
-					counter += 1
 
 	"""Adds a run to the map. This function takes in a list of gps points """
 	def addRun(self,gps):

@@ -1,6 +1,7 @@
 from stravaAPI import StravaAPI
 from mapViz import RunMap
 import time
+import jinja2
 #import threading
 
 #This is the function that runs the strava picture program
@@ -21,6 +22,7 @@ def main():
 	#generate the map for the first time
 	m.saveRuns(lastRun)
 	m.genMap()
+	genHTML()
 	print "First map generated"
 
 	#Now we just update and save forever
@@ -30,6 +32,7 @@ def main():
 		lastRun = updateInfo(client,m,lastRun)
 		m.saveRuns(lastRun)
 		m.genMap()
+		genHTML()
 		print "New map generated"
 
 
@@ -72,7 +75,16 @@ def addRunIDsToMap(client,m,runIDs):
 	for runID in reversed(runIDs):
 		run = client.getGPSFromID(runID)
 		m.addRun(run)
-		
+
+def genHTML():
+	templateLoader = jinja2.FileSystemLoader( searchpath="./templates")
+	templateEnv = jinja2.Environment(loader=templateLoader)
+	TEMPLATE_FILE = "template.html"
+	template = templateEnv.get_template( TEMPLATE_FILE )
+	outputText = template.render() # this is where to put args to the template renderer
+
+	with open("index.html", "wb") as fh:
+		fh.write(outputText)		
 
 
 

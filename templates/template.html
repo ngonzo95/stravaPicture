@@ -6,6 +6,20 @@
 </head>
 <body>
 	{% include 'maps/map.html' %}
-	{% include 'dropdown.html' %}
+	
+	{% if maps|length > 1 %}
+	<!--For some reason this z-index does the trick of keeping the drop down on top. not sure why ... :) -->
+	<div class="dropdown" style='position: absolute; z-index: 31415900; top: 10px; right: 10px;'>
+		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Maps
+		</button>
+
+		<div class="dropdown-menu"  aria-labelledby="dropdownMenuButton" style= 'background-color:transparent;'>
+			{%for map in maps %}
+				<a class="dropdown-item" style= 'float: left; clear: left; display:inline;' 
+				href={{map.href}}> {{map.caption}} </a>
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
 </body>
 </html>

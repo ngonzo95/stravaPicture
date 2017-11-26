@@ -9,7 +9,7 @@ def main():
 	#initilization
 	client = StravaAPI("token.txt")
 	numRuns = 30
-	m = RunMap(numRuns, startPoint=[[44.9501,-93.2701],[42.352190,-71.078996]])
+	m = RunMap(numRuns)
 
 	#In the case where there is no base file and we cannot connect to
 	#the strava api we will keep trying to initilize 
@@ -22,7 +22,7 @@ def main():
 	#generate the map for the first time
 	m.saveRuns(lastRun)
 	m.genMap()
-	genHTML()
+	genHTML(m)
 	print "First map generated"
 
 	#Now we just update and save forever
@@ -32,7 +32,7 @@ def main():
 		lastRun = updateInfo(client,m,lastRun)
 		m.saveRuns(lastRun)
 		m.genMap()
-		genHTML()
+		genHTML(m)
 		print "New map generated"
 
 
@@ -84,7 +84,7 @@ def genHTML(m):
 	
 	#First we can make the maps list since that will be the same in all cases
 	mapList = []
-	for i in range(m.numMaps):
+	for i in range(m.numMaps()):
 		mapDict = {}
 		mapDict['href'] = 'index' + str(i) + '.html'
 		mapDict['caption'] = 'Map ' + str(i)
@@ -93,7 +93,7 @@ def genHTML(m):
 	#Now render each map with its own index file
 	renderDict = {'maps': mapList}
 
-	for i in range(m.numMaps):
+	for i in range(m.numMaps()):
 		renderDict['baseMap'] = 'maps/map' + str(i) + '.html'
 
 		outputText = template.render(renderDict)

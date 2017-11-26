@@ -2,6 +2,7 @@ import folium
 from colour import Color
 import collections
 import json
+from math import radians, cos, sin, asin, sqrt
 
 class RunMap:
 	"""docstring for RunMap"""
@@ -9,7 +10,7 @@ class RunMap:
 	#optional fields include map type and the number of runs the map display. you can also specify
 	#a specific colorGradient which is a list of different colors of size numRuns, the oldest run
 	#will use the color at index 0
-	def __init__(self, numRuns, startPoint=[[44.9501,-93.2701]] ,
+	def __init__(self, numRuns, startPoint=[] ,
 		mapType='https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
 		attr='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 		colorGrad = None):
@@ -59,6 +60,16 @@ class RunMap:
 		#add the run to the list
 		self._runList.append(gps)
 
+		#Figure out if we need to add a new starting point for this run or if it will fit in 
+		#an existing map
+		for gpsPoint in self._startPoints:
+			if self._distBetween(gpsPoint, gps[0]) < 100:
+				return
+
+		#If we did not return by this point then this point does not fit in a map and we must 
+		#add one for it
+		self._startPoints.append(gps[0])
+
 	"""Save all the file information by saving the runlist queue and the
 	   time of the last run."""
 	def saveRuns(self, lastRun):
@@ -73,10 +84,24 @@ class RunMap:
 			with open('runSave.json') as saveFile:    
 				lastRun, savedQueue = json.load(saveFile)
 
+			#Go through the run list to load starting points
+			for run in savedQueue:
+				addPoint = True
+				for gpsPoint in self._startPoints:
+					if self._distBetween(gpsPoint, run[0]) < 100:
+						addPoint = False
+						break
+				#If we did not return by this point then this point does not fit in a map and we must 
+				#add one for it
+				if addPoint:
+					self._startPoints.append(run[0])
+
 			self._runList = collections.deque(savedQueue)
+
 			return lastRun
         #If the load fails makes sure the queue is empty and we return 0
 		except Exception, e:
+			raise e
 			self._runList = collections.deque()
 			return 0
 
@@ -88,6 +113,27 @@ class RunMap:
 	"""Gets the number of maps the map viz will create at this point"""
 	def numMaps(self):
 		return len(self._startPoints)
+
+
+	"""Estimates distance between two gps points in km taken from stack
+	   exchange:"""
+
+	def _distBetween(self,p1,p2):
+		lat1 = p1[0]
+		lon1 = p1[1]
+		lat2 = p2[0]
+		lon2 = p2[1]
+		# convert decimal degrees to radians 
+		lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+		# haversine formula 
+		dlon = lon2 - lon1 
+		dlat = lat2 - lat1 
+		a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+		c = 2 * asin(sqrt(a)) 
+		# Radius of earth in kilometers is 6371
+		km = 6371* c
+		return km
+
 
 
 		

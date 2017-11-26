@@ -9,7 +9,7 @@ class RunMap:
 	#optional fields include map type and the number of runs the map display. you can also specify
 	#a specific colorGradient which is a list of different colors of size numRuns, the oldest run
 	#will use the color at index 0
-	def __init__(self, numRuns, startPoint=[44.9501,-93.2701] ,
+	def __init__(self, numRuns, startPoint=[[44.9501,-93.2701]] ,
 		mapType='https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
 		attr='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 		colorGrad = None):
@@ -17,7 +17,7 @@ class RunMap:
 		#Set the memeber variables
 		self._mapType = mapType
 		self._attr = attr
-		self._startPoint = startPoint
+		self._startPoints = startPoint
 		self._numRuns = numRuns
 
 		#Create a list that will hold our runs
@@ -32,20 +32,22 @@ class RunMap:
 
 	"""Renders the map and saves the html file"""
 	def genMap(self):
-		mapViz = folium.Map(location=self._startPoint,
-			zoom_start=12,
-			tiles= self._mapType,
-			attr= self._attr)
+		#Create a map for each of the starting points
+		for j in range(len(self._startPoints)):
+			mapViz = folium.Map(location=self._startPoints[j],
+				zoom_start=12,
+				tiles= self._mapType,
+				attr= self._attr)
 
-		#mapViz.create_map(path='map.html', template='runHTMLTemplate.html')
+			#mapViz.create_map(path='map.html', template='runHTMLTemplate.html')
 
-		for i in range(len(self._runList)):
-			runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i].hex, opacity=0.4)
-			runViz.add_to(mapViz)
+			for i in range(len(self._runList)):
+				runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i].hex, opacity=0.4)
+				runViz.add_to(mapViz)
 
 
-		#save the map to the maps file
-		mapViz.save('templates/maps/map.html')
+			#save the map to the map file
+			mapViz.save('templates/maps/map'+ str(j) +'.html')
 
 
 	"""Adds a run to the map. This function takes in a list of gps points """

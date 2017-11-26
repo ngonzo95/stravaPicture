@@ -9,7 +9,7 @@ def main():
 	#initilization
 	client = StravaAPI("token.txt")
 	numRuns = 30
-	m = RunMap(numRuns, startPoint=[44.9501,-93.2701])
+	m = RunMap(numRuns, startPoint=[[44.9501,-93.2701],[42.352190,-71.078996]])
 
 	#In the case where there is no base file and we cannot connect to
 	#the strava api we will keep trying to initilize 
@@ -81,11 +81,15 @@ def genHTML():
 	templateEnv = jinja2.Environment(loader=templateLoader)
 	TEMPLATE_FILE = "template.html"
 	template = templateEnv.get_template( TEMPLATE_FILE )
-	outputText = template.render() # this is where to put args to the template renderer
+	outputText = template.render({'baseMap':'maps/map0.html','maps':[{'href':'index1.html', 'caption': 'min'}, {'href':'index2.html', 'caption': 'bos'}]}) # this is where to put args to the template renderer
 
-	with open("index.html", "wb") as fh:
+	with open("views/index1.html", "wb") as fh:
 		fh.write(outputText)		
 
+	outputText = template.render({'baseMap':'maps/map1.html','maps':[{'href':'index1.html', 'caption': 'min'}, {'href':'index2.html', 'caption': 'bos'}]}) # this is where to put args to the template renderer
+
+	with open("views/index2.html", "wb") as fh:
+		fh.write(outputText)
 
 
 if __name__ == '__main__':

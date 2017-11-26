@@ -7,5 +7,5 @@ if __name__ == '__main__':
 	template = templateEnv.get_template( TEMPLATE_FILE )
 	outputText = template.render({'maps':[{'href':'index.html', 'caption': 'hi'}, {'href':'#', 'caption': 'bye', 'current': True}]}) # this is where to put args to the template renderer
 
-	with open("my_new_file.html", "wb") as fh:
+	with open("views/my_new_file.html", "wb") as fh:
 		fh.write(outputText)

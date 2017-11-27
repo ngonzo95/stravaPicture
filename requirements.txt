@@ -1,0 +1,4 @@
+jinja2==2.10
+geopy==1.11.0
+colour==0.1.4
+folium==0.5.0

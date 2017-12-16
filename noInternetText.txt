@@ -1,0 +1,4 @@
+It looks like you are running the Strava Picture in a new place. In order to
+setup the Picture you must follow the steps below:
+
+1)Set your times zone 

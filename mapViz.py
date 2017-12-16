@@ -147,14 +147,15 @@ class RunMap:
 			self._startPoints.append(point)
 
 	def _getCaption(self, mapNum):
-		#Get the location information from geolocator
-		geolocator = Nominatim()
-		pointList = self._startPoints[mapNum]
-		pointStr = str(pointList[0]) + ', ' + str(pointList[1])
-		location = geolocator.reverse(pointStr)
 		
 		#Try to get a city or town name, if not possible just return map
 		try:
+			#Get the location information from geolocator
+			geolocator = Nominatim()
+			pointList = self._startPoints[mapNum]
+			pointStr = str(pointList[0]) + ', ' + str(pointList[1])
+			location = geolocator.reverse(pointStr, timeout=10)
+
 			if 'city' in location.raw['address']:
 				return location.raw['address']['city']
 

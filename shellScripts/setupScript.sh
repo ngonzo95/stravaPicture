@@ -3,7 +3,7 @@
 #This script checks for internet connectivity. If there is no connnection
 #Open the wifi settings and time zone so the user can change them.
 
-if ping -c 1 asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfadfsadf.com >/dev/null ; then
+if ping -c 1 google.com >/dev/null ; then
 	echo Internet connectivity confirmed. Do nothing.
 
 else
@@ -11,4 +11,5 @@ else
 	matchbox-keyboard &
 	sudo raspi-config
 	sudo leafpad /etc/wpa_supplicant/wpa_supplicant.conf
+        sudo reboot
 fi

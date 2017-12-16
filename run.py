@@ -6,6 +6,7 @@ import jinja2
 
 #This is the function that runs the strava picture program
 def main():
+	print "Starting time, ", time.asctime(time.localtime())
 	#initilization
 	client = StravaAPI("token.txt")
 	numRuns = 30
@@ -23,7 +24,7 @@ def main():
 	m.saveRuns(lastRun)
 	m.genMap()
 	genHTML(m)
-	print "First map generated"
+	print "First map generated, ", time.asctime(time.localtime())
 
 	#Now we just update and save forever
 	while True:
@@ -33,7 +34,7 @@ def main():
 		m.saveRuns(lastRun)
 		m.genMap()
 		genHTML(m)
-		print "New map generated"
+		print "New map generated, ", time.asctime(time.localtime())
 
 
 

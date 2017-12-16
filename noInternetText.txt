@@ -1,4 +1,44 @@
-It looks like you are running the Strava Picture in a new place. In order to
-setup the Picture you must follow the steps below:
+It looks like you are running the Strava Picture in a new place. Follow the 
+steps below to configure the device.
 
-1)Set your times zone 
+1) Notice that there are currently 4 windows open. This one, One called 
+   runScript.sh, a keyboard, and one called setupScript.sh (blue screen). 
+   close the one called runScript.sh
+
+2)Set your times zone:
+  Interacting with setupScript:
+
+    Now use setupScript.sh and the keyboard to setup the timezone.
+    You can only interact with setupScript using the keyboard, not
+    the mouse. Notice the 4 arrows keys on the bottom row on the
+    right side of the key board. Use them to navigate. Make sure to
+    Click on setupScript once so the keyboard know which window to 
+    type in.
+
+  Change timezone with these commands:
+    a) Naviagate to Localisation Options (row 4 use down key) and
+       press enter.
+
+    b) Navigate to Change timezone (T2) and press enter.
+
+    c) Follow the on screen prompts and pick the right time zone.
+
+    d) Once you finish it will take you back to the main prompt
+       exit it by hitting escape
+
+3)Set up your new wifi name and pasword
+  A new window will have opened called wpa_supplicant.
+  Scroll down till you see something like:
+    network={
+      ssid="wifi_name"
+      psk="password"
+    }
+
+  replace the ssid and psk  with your exact wifi name and password
+  Be sure to keep the double quotation marks.
+
+  Once you have made these changes hit the exit button and press save.
+  When you do this the raspberry pi will restart and everything should 
+  run correctly.
+
+    

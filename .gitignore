@@ -1,6 +1,7 @@
 picLog.txt
 token.txt
 *.json
+*.p
 *.pyc
 templates/maps/*.html
 views/*.html

@@ -2,6 +2,8 @@ from stravaAPI import StravaAPI
 from mapViz import RunMap
 import time
 import jinja2
+import dill
+import pickle
 #import threading
 
 #This is the function that runs the strava picture program
@@ -10,18 +12,17 @@ def main():
 	#initilization
 	client = StravaAPI("token.txt")
 	numRuns = 30
-	m = RunMap(numRuns)
 
 	#In the case where there is no base file and we cannot connect to
 	#the strava api we will keep trying to initilize 
-	lastRun = initInfo(client,m,numRuns)
+	lastRun, m = initInfo(client, numRuns)
 	while lastRun == 0:
-		lastRun = initInfo(client,m,numRuns)
+		lastRun = initInfo(client, numRuns)
 		#Try every 5 minutes
 		time.sleep(300)
 		
 	#generate the map for the first time
-	m.saveRuns(lastRun)
+	saveInfo(lastRun,m)
 	m.genMap()
 	genHTML(m)
 	print "First map generated, ", time.asctime(time.localtime())
@@ -31,7 +32,7 @@ def main():
 		#Update every 30 mins
 		time.sleep(1800)
 		lastRun = updateInfo(client,m,lastRun)
-		m.saveRuns(lastRun)
+		saveInfo(lastRun,m)
 		m.genMap()
 		genHTML(m)
 		print "New map generated, ", time.asctime(time.localtime())
@@ -55,21 +56,27 @@ def updateInfo(client,m,lastRun):
 	return lastRun
 
 
-def initInfo(client,m,numRuns):
+def initInfo(client, numRuns):
 	print "initilizing info"
 	#Try to load runs from file
 	print "Trying to load runs from save"
-	lastRun = m.loadRuns()
-    
-    #If the load failed get runs from the API
-	if lastRun == 0:
-		print "Load Failed Calling the StravaAPI"
-		lastRun, runIDs = client.getLastNRunIDs(numRuns)
-		addRunIDsToMap(client, m, runIDs)
-	else:
+	try:
+		lastRun, runMap = pickle.load( open( "runSave_1V_1.p", "rb" ) )
 		print "Load Succeded"
 
-	return lastRun
+		return lastRun, runMap
+	
+	#If the load fails Then we quiery the StravaAPI and make our own new map
+	except Exception, e:
+		print e
+		runMap = RunMap(numRuns)
+
+		print "Load Failed Calling the StravaAPI"
+		lastRun, runIDs = client.getLastNRunIDs(numRuns)
+		addRunIDsToMap(client, runMap, runIDs)
+
+		return lastRun, runMap
+	
 
 def addRunIDsToMap(client,m,runIDs):
 	#use the strava api to add runs to the map based on runIDs
@@ -95,7 +102,8 @@ def genHTML(m):
 		with open(fileName, "wb") as fh:
 			fh.write(outputText)		
 
-
+def saveInfo(lastRun,m):
+	pickle.dump( (lastRun,m), open( "runSave_1V_1.p", "wb" ) )
 
 if __name__ == '__main__':
 	main()

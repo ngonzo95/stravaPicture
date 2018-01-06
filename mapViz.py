@@ -1,9 +1,9 @@
 import folium
 from colour import Color
 import collections
-import json
 from math import radians, cos, sin, asin, sqrt
 from geopy.geocoders import Nominatim
+from areaMap import AreaMap
 
 class RunMap:
 	"""docstring for RunMap"""
@@ -17,13 +17,10 @@ class RunMap:
 		colorGrad = None):
 
 		#Set the memeber variables
-		self._mapType = mapType
+		self._baseMap = mapType
 		self._attr = attr
-		self._startPoints = startPoint
 		self._numRuns = numRuns
-
-		#Create a list that will hold our runs
-		self._runList = collections.deque()
+		self._nextMapID = 0
 
 		#If we were not given a color gradient generate our own
 		if colorGrad == None:
@@ -32,82 +29,51 @@ class RunMap:
 
 		self._colors = colorGrad
 
+		#Create the list of area maps
+		self._areaMaps = []
+
+		#For all the starting points listed create a map
+		for i in range(len(startPoint)):
+			areaMap = self._CreateNewMap(startPoint[i])
+
 	"""Renders the map and saves the html file"""
 	def genMap(self):
 		#Create a map for each of the starting points
-		for j in range(len(self._startPoints)):
-			mapViz = folium.Map(location=self._startPoints[j],
-				zoom_start=12,
-				tiles= self._mapType,
-				attr= self._attr)
-
-			for i in range(len(self._runList)):
-				runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i].hex, opacity=0.4)
-				runViz.add_to(mapViz)
-
-
-			#save the map to the map file
-			mapViz.save('templates/maps/map'+ str(j) +'.html')
+		for areaMap in self._areaMaps:
+			areaMap.genMap()
+			
 
 
 	"""Adds a run to the map. This function takes in a list of gps points """
 	def addRun(self,gps):
-		#if we have to many runs then remove the oldest run from this list (which is the first one)
-		if len(self._runList) == self._numRuns:
-			self._runList.popleft()
+		#Try to add it to existing maps
+		runAdded = False
+		for areaMap in self._areaMaps:
+			#If we can add the run to one of the existing maps do it
+			if self._distBetween(gps[0], areaMap.startPoint) < 100:
+				areaMap.addRun(gps)
+				runAdded = True
 
-		#add the run to the list
-		self._runList.append(gps)
-
-		#Figure out if we need to add a new starting point for this run or if it will fit in 
-		#an existing map
-		self._checkPointOnMap(gps[0])
-
-	"""Save all the file information by saving the runlist queue and the
-	   time of the last run."""
-	def saveRuns(self, lastRun):
-		with open ('runSave.json','w') as outfile:
-			json.dump((lastRun, list(self._runList)), outfile)
-
-	"""Load from file and return the time of the last run. If we get an error
-	   while loading the queue will revert to empty and return 0."""
-	def loadRuns(self):
-		#Try to load from the file 
-		try:
-			with open('runSave.json') as saveFile:    
-				lastRun, savedQueue = json.load(saveFile)
-
-			#Go through the run list to load starting points
-			for run in savedQueue:
-				self._checkPointOnMap(run[0])
-
-			self._runList = collections.deque(savedQueue)
-
-			return lastRun
-        
-        #If the load fails makes sure the queue is empty and we return 0
-		except Exception, e:
-			print e
-			self._runList = collections.deque()
-			return 0
-
-
-			lastRun, runIDs = client.getLastNRunIDs(numRuns)
-			runGPS = getGPS(client, runIDs)
-
+		#If the run was not added to any maps then create an new area map and add it to that
+		if not runAdded:
+			newMap = self._createNewMap(gps[0])
+			newMap.addRun(gps)
 
 	"""Gets the number of maps the map viz will create at this point"""
 	def numMaps(self):
-		return len(self._startPoints)
+		return len(self._areaMaps)
 
 	"""Returns a map that is uses for creating the drop down options"""
 	def getMapDropdownDict(self):
 		#First we can make the maps list since that will be the same in all cases
+		#todo get mapID startPoint Pairs
 		mapList = []
-		for i in range(self.numMaps()):
+
+
+		for areaMap in self._areaMaps:
 			mapDict = {}
-			mapDict['href'] = 'index' + str(i) + '.html'
-			mapDict['caption'] = self._getCaption(i)
+			mapDict['href'] = 'index' + str(areaMap.mapID) + '.html'
+			mapDict['caption'] = self._getCaption(areaMap.startPoint)
 			mapList.append(mapDict)
 
 		return {'maps': mapList}
@@ -131,28 +97,13 @@ class RunMap:
 		km = 6371* c
 		return km
 
-	"""Checks if this point is visable in a map and if it is not it adds it as a starting point
-	   of a new map"""
-
-	def _checkPointOnMap(self, point):
-		addPoint = True
-		for gpsPoint in self._startPoints:
-			if self._distBetween(gpsPoint, point) < 100:
-				addPoint = False
-				break
-
-		#If we did not return by this point then this point does not fit in a map and we must 
-		#add one for it
-		if addPoint:
-			self._startPoints.append(point)
-
-	def _getCaption(self, mapNum):
+	def _getCaption(self, point):
 		
 		#Try to get a city or town name, if not possible just return map
 		try:
 			#Get the location information from geolocator
 			geolocator = Nominatim()
-			pointList = self._startPoints[mapNum]
+			pointList = point
 			pointStr = str(pointList[0]) + ', ' + str(pointList[1])
 			location = geolocator.reverse(pointStr, timeout=10)
 
@@ -168,7 +119,16 @@ class RunMap:
 		except Exception, e:
 			print e
 			return "Map"
-		
+
+	def _createNewMap(self, startPoint):
+		newMap = AreaMap(self._nextMapID, self._numRuns, startPoint, self._baseMap, self._attr, self._colors)
+		self._nextMapID += 1
+		self._areaMaps.append(newMap)
+
+		#Return the map incase they want to add things to it
+		return newMap
+
+
 #A sample script to run to test the file
 def main():
 	#We only want to import json for testing

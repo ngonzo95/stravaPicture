@@ -4,7 +4,9 @@
 #Open the wifi settings and time zone so the user can change them.
 
 if ping -c 1 google.com >/dev/null ; then
-	echo Internet connectivity confirmed. Do nothing.
+	echo Internet connectivity confirmed. Starting Chromium.
+	chromium-browser --noerrdialogs --incognito --kiosk /home/pi/Documents/stravaPicture/views/index0.html
+
 
 else
 	leafpad /home/pi/Documents/stravaPicture/noInternetText.txt & 

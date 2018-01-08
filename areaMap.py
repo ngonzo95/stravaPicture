@@ -21,13 +21,15 @@ class AreaMap:
 
 	"""Generate the map html for this area"""
 	def genMap(self):
+		#This deals with the case where the runList is not full
+		colorOffset = self._numRuns - len(self._runList)
 		mapViz = folium.Map(location=self.startPoint,
 				zoom_start=12,
 				tiles= self._baseMap,
 				attr= self._attr)
 
 		for i in range(len(self._runList)):
-			runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i].hex, opacity=0.4)
+			runViz = folium.PolyLine(locations=self._runList[i], color=self._colors[i+colorOffset].hex, opacity=0.4)
 			runViz.add_to(mapViz)
 
 		#save the map to the map file

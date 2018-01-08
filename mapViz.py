@@ -113,6 +113,9 @@ class RunMap:
 			if 'town' in location.raw['address']:
 				return location.raw['address']['town']
 
+			if 'hamlet' in location.raw['address']:
+				return location.raw['address']['hamlet']
+
 			print "Weird location recived"
 			print location.raw
 			return "Map"

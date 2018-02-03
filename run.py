@@ -38,14 +38,6 @@ def main():
 		print "New map generated, ", time.asctime(time.localtime())
 
 
-
-	#TODO use threads to allow us to do other things while we are waiting
-	#Update the map every 30 minutes
-	#threading.Timer(1800, updateInfo(client,m,runIDs,runGPS,lastRun))
-
-	#Save progress every day
-	#threading.Timer(864000, saveInfo(runIDs,runGPS,lastRun))
-
 def updateInfo(client,m,lastRun):
 	print "updating info"
 	#Get the last couple runs

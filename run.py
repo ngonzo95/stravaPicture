@@ -64,7 +64,7 @@ def initInfo(client, numRuns):
 		runMap = RunMap(numRuns)
 
 		print "Load Failed Calling the StravaAPI"
-		lastRun, runIDs = client.getLastNRunIDs(numRuns)
+		lastRun, runIDs = client.getLastNRunIDs(3*numRuns)
 		addRunIDsToMap(client, runMap, runIDs)
 
 		return lastRun, runMap
@@ -85,7 +85,8 @@ def genHTML(m):
 	#Now render each map with its own index file
 	renderDict = m.getMapDropdownDict()
 
-	for i in range(m.numMaps()):
+	#render all of the area maps plus the worldMap
+	for i in range(m.numMaps()+1):
 		renderDict['baseMap'] = 'maps/map' + str(i) + '.html'
 
 		outputText = template.render(renderDict)
@@ -96,6 +97,7 @@ def genHTML(m):
 
 def saveInfo(lastRun,m):
 	pickle.dump( (lastRun,m), open( "runSave_1V_1.p", "wb" ) )
+	pickle.dump((lastRun,m.rawSave()), open( "raw_runSave.p", "wb" ))
 
 if __name__ == '__main__':
 	main()

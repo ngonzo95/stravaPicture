@@ -44,3 +44,6 @@ class AreaMap:
 		#add the run to the list
 		self._runList.append(gps)
 
+	def getRunsToSave(self):
+		return self._runList
+

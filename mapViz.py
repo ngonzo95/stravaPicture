@@ -4,6 +4,7 @@ import collections
 from math import radians, cos, sin, asin, sqrt
 from geopy.geocoders import Nominatim
 from areaMap import AreaMap
+from worldMap import WorldMap
 
 class RunMap:
 	"""docstring for RunMap"""
@@ -24,13 +25,17 @@ class RunMap:
 
 		#If we were not given a color gradient generate our own
 		if colorGrad == None:
-			startColor = Color("#0D1D3B")
-			colorGrad = list(startColor.range_to(Color("#FFA13D"), numRuns))
+			startColor = Color(rgb=[0.05,0.11,1])
+			colorGrad = list(startColor.range_to(Color(rgb=[1,0,0.35]), numRuns))
 
 		self._colors = colorGrad
 
 		#Create the list of area maps
 		self._areaMaps = []
+
+		#Create the worldMap
+		self._worldMap = WorldMap(self._nextMapID, [39.8333,-98.58333], self._baseMap, self._attr)
+		self._nextMapID += 1
 
 		#For all the starting points listed create a map
 		for i in range(len(startPoint)):
@@ -41,6 +46,8 @@ class RunMap:
 		#Create a map for each of the starting points
 		for areaMap in self._areaMaps:
 			areaMap.genMap()
+
+		self._worldMap.genMap()
 			
 
 
@@ -58,6 +65,7 @@ class RunMap:
 		if not runAdded:
 			newMap = self._createNewMap(gps[0])
 			newMap.addRun(gps)
+			self._worldMap.addArea(newMap.startPoint, self._getCaption(newMap.startPoint), newMap.mapID)
 
 	"""Gets the number of maps the map viz will create at this point"""
 	def numMaps(self):
@@ -67,7 +75,7 @@ class RunMap:
 	def getMapDropdownDict(self):
 		#First we can make the maps list since that will be the same in all cases
 		#todo get mapID startPoint Pairs
-		mapList = []
+		mapList = [{'href':'index0.html','caption':'USA Map'}]
 
 
 		for areaMap in self._areaMaps:
@@ -77,6 +85,17 @@ class RunMap:
 			mapList.append(mapDict)
 
 		return {'maps': mapList}
+
+	def rawSave(self):
+		runsToSave = []
+
+		for aMap in self._areaMaps:
+			runsFromArea = aMap.getRunsToSave()
+			for run in runsFromArea:
+				runsToSave.append(run)
+
+		return runsToSave
+
 
 	"""Estimates distance between two gps points in km taken from stack
 	   exchange:"""

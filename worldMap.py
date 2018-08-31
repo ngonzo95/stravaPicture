@@ -1,9 +1,5 @@
 import folium
 
-
-f = open("templates/maps/map2.html","r")
-popUpString = f.read()
-
 """This class represents a map of a single running area"""
 class WorldMap:
 	def __init__(self, mapID, startPoint, baseMap, attr):

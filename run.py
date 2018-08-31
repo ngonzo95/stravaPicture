@@ -32,7 +32,7 @@ def main():
 	#Now we just update and save forever
 	while True:
 		#Update every 30 mins
-		time.sleep(1800)
+		time.sleep(3600)
 		lastRun = updateInfo(client,m,lastRun)
 
 		saveInfo(lastRun,m)

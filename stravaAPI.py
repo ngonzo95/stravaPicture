@@ -32,7 +32,7 @@ class StravaAPI:
 		#If we cannot load the url then return the empty string
 		#and print the error
 		except Exception, e:
-			print str(e)
+			print "Exception in strava api: ", str(e)
 			return []
 
 		#return the resulting json object as a dictonary
@@ -156,13 +156,17 @@ class StravaAPI:
 #Basic script to show that class functions work as expected
 def main():
 	client = StravaAPI('/Users/Nick/Documents/stravaProject/stravaPicture/token.txt')
-	timeStamp, runIDs = client.getLastNRunIDs(100)
+	timeStamp, runIDs = client.getLastNRunIDs(5)
 
 	#runIDs = client._getRunIDs()
 	#timeStamp, runIDs = client.getLatestRuns(1507575398)
 
 	print timeStamp
 	print len(runIDs)
+	print runIDs
+
+	for runID in runIDs:
+		print client.getGPSFromID(runID)
 	
 	# gpsData = []
 	# for ID in runIDs:

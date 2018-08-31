@@ -121,7 +121,7 @@ class RunMap:
 		#Try to get a city or town name, if not possible just return map
 		try:
 			#Get the location information from geolocator
-			geolocator = Nominatim()
+			geolocator = Nominatim(user_agent="strava_picture_sarah")
 			pointList = point
 			pointStr = str(pointList[0]) + ', ' + str(pointList[1])
 			location = geolocator.reverse(pointStr, timeout=10)
@@ -139,7 +139,7 @@ class RunMap:
 			print location.raw
 			return "Map"
 		except Exception, e:
-			print e
+			print "geoLocator threw exception: ", e
 			return "Map"
 
 	def _createNewMap(self, startPoint):

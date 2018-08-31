@@ -11,7 +11,7 @@ def main():
 	print "Starting time, ", time.asctime(time.localtime())
 	#initilization
 	client = StravaAPI("token.txt")
-	numRuns = 30
+	numRuns = 60
 
 	#In the case where there is no base file and we cannot connect to
 	#the strava api we will keep trying to initilize 
@@ -60,7 +60,7 @@ def initInfo(client, numRuns):
 	
 	#If the load fails Then we quiery the StravaAPI and make our own new map
 	except Exception, e:
-		print e
+		print "exception in run.py: ", e
 		runMap = RunMap(numRuns)
 
 		print "Load Failed Calling the StravaAPI"

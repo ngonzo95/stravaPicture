@@ -5,3 +5,4 @@ token.txt
 *.pyc
 templates/maps/*.html
 views/*.html
+rootkey.csv

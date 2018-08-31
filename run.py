@@ -1,5 +1,6 @@
 from stravaAPI import StravaAPI
 from mapViz import RunMap
+from S3UploadViews import upload_views_to_s3
 import time
 import jinja2
 import dill
@@ -25,6 +26,7 @@ def main():
 	saveInfo(lastRun,m)
 	m.genMap()
 	genHTML(m)
+	upload_views_to_s3()
 	print "First map generated, ", time.asctime(time.localtime())
 
 	#Now we just update and save forever
@@ -35,6 +37,7 @@ def main():
 		saveInfo(lastRun,m)
 		m.genMap()
 		genHTML(m)
+		upload_views_to_s3()
 		print "New map generated, ", time.asctime(time.localtime())
 
 

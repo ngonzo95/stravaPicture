@@ -125,15 +125,11 @@ class RunMap:
 			pointList = point
 			pointStr = str(pointList[0]) + ', ' + str(pointList[1])
 			location = geolocator.reverse(pointStr, timeout=10)
+			possibleTitles= ['city', 'town', 'hamlet', 'village']
 
-			if 'city' in location.raw['address']:
-				return location.raw['address']['city']
-
-			if 'town' in location.raw['address']:
-				return location.raw['address']['town']
-
-			if 'hamlet' in location.raw['address']:
-				return location.raw['address']['hamlet']
+			for title in possibleTitles:
+				if title in location.raw['address']:
+					return location.raw['address'][title]
 
 			print "Weird location recived"
 			print location.raw

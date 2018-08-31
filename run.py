@@ -18,7 +18,7 @@ def main():
 	#the strava api we will keep trying to initilize 
 	lastRun, m = initInfo(client, numRuns)
 	while lastRun == 0:
-		lastRun = initInfo(client, numRuns)
+		lastRun, m = initInfo(client, numRuns)
 		#Try every 5 minutes
 		time.sleep(300)
 		
@@ -34,11 +34,13 @@ def main():
 		#Update every 30 mins
 		time.sleep(1800)
 		lastRun = updateInfo(client,m,lastRun)
+
 		saveInfo(lastRun,m)
 		m.genMap()
 		genHTML(m)
 		upload_views_to_s3()
 		print "New map generated, ", time.asctime(time.localtime())
+		print "Last run saved was at: ", lastRun
 
 
 def updateInfo(client,m,lastRun):

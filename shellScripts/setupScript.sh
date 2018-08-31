@@ -9,7 +9,7 @@ while [ $i -lt 10 ]
 do
 	if ping -c 1 google.com >/dev/null ; then
 		echo Internet connectivity confirmed. Starting Chromium.
-		chromium-browser --noerrdialogs --incognito --kiosk /home/pi/Documents/stravaPicture/views/index0.html
+		chromium-browser --noerrdialogs --incognito --kiosk nicholas-gonzalez.com/index0.html
 		exit
 	fi
 

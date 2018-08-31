@@ -5,6 +5,5 @@
 cd ~/Documents/stravaPicture
 git pull >> picLog.txt || true
 pip install -r requirements.txt >> picLog.txt
-python -u run.py >> picLog.txt
 
 

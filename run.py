@@ -33,14 +33,19 @@ def main():
 	while True:
 		#Update every 30 mins
 		time.sleep(3600)
-		lastRun = updateInfo(client,m,lastRun)
+		currentRun = updateInfo(client,m,lastRun)
 
-		saveInfo(lastRun,m)
-		m.genMap()
-		genHTML(m)
-		upload_views_to_s3()
-		print "New map generated, ", time.asctime(time.localtime())
-		print "Last run saved was at: ", lastRun
+		if lastRun == currentRun:
+			print "No new runs found."
+
+		else:
+			saveInfo(lastRun,m)
+			m.genMap()
+			genHTML(m)
+			upload_views_to_s3()
+			print "New map generated, ", time.asctime(time.localtime())
+			print "Last run saved was at: ", lastRun
+			lastRun = currentRun
 
 
 def updateInfo(client,m,lastRun):
